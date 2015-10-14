@@ -13,12 +13,15 @@ complete <- function (directory, id = 1) {
     
     rows <- nrow(fileSubset)
     
-    print(paste(csvi,rows))
-    
+    completeSet <- rbind(completeSet, cbind(csvi,rows))
   }
+  
+  colnames(completeSet) <- c("id", "nobs")
+  return (completeSet)
   
 }
 
 
+## https://github.com/derekfranks/practice_assignment/blob/master/Practice_Assignment.pdf
 
 assert <- complete("specdata", c(2, 4, 8, 10, 12))
