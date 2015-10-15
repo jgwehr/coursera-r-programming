@@ -27,6 +27,3 @@ pollutantmean <-function (directory, pollutant, ids = 0) {
 
   return ( mean(fileData[,pollutant], na.rm=TRUE)) ##subset the pollutant category and remove na
 }
-
-
-pollutantmean("specdata", "nitrate")
