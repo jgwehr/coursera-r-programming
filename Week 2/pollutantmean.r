@@ -5,8 +5,13 @@ pollutantmean <-function (directory, pollutant, ids = 0) {
   stopifnot(dir.exists(directory))
   stopifnot(pollutant == "sulfate" | pollutant == "nitrate")
   ##stopifnot(is.integer(ids))
- 
+  
   fileList <- list.files(directory, full.names=TRUE) ##Get the full file names
+  
+  if (is.numeric(ids) & ids < 1) {
+    ids <- 1:length(fileList)
+  }
+  
   fileList <- fileList[ids] ##new list of only the names we care about
   
   ##Initiate
@@ -21,13 +26,7 @@ pollutantmean <-function (directory, pollutant, ids = 0) {
   
 
   return ( mean(fileData[,pollutant], na.rm=TRUE)) ##subset the pollutant category and remove na
-  
-
-##  for(csvi in ids) {
-    ##csv <- sprintf(fmt="%03i",csvi)
-    ##filename <- paste0(directory,"/",csv,".csv", sep="")
-  ##  dim(fileList)
-    ##meanTable <- read.csv(directory)
-##  }
-
 }
+
+
+pollutantmean("specdata", "nitrate")
