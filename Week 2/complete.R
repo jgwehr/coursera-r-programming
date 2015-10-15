@@ -1,4 +1,4 @@
-complete <- function (directory, id = 1) {
+complete <- function (directory, id = -1) {
   
   ##Validations
   stopifnot(dir.exists(directory))
@@ -6,6 +6,10 @@ complete <- function (directory, id = 1) {
   fileList <- list.files(directory, full.names=TRUE) ##Get the full file names
   
   completeSet <- data.frame()
+  
+  if (is.numeric(id) & id < 0) {
+    id <- 1:length(fileList)
+  }
   
   for (csvi in id) {
     fileTemp <- read.csv(fileList[csvi])
@@ -23,5 +27,3 @@ complete <- function (directory, id = 1) {
 
 
 ## https://github.com/derekfranks/practice_assignment/blob/master/Practice_Assignment.pdf
-
-assert <- complete("specdata", c(2, 4, 8, 10, 12))
