@@ -7,11 +7,15 @@ complete <- function (directory, id = -1) {
   
   completeSet <- data.frame()
   
+  ## allow for empty params
   if (is.numeric(id) & id < 0) {
     id <- 1:length(fileList)
   }
   
   for (csvi in id) {
+    ## Note that we could validate the file exists. But, as we've just gotten the actual name,
+    ##  the file should still exist except in very rare cases
+    
     fileTemp <- read.csv(fileList[csvi])
     fileSubset <- subset(fileTemp,complete.cases(fileTemp))
     
