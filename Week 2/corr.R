@@ -1,3 +1,5 @@
+source('complete.R')
+
 corr <- function(directory, threshold = 0) {
   ## a directory of data files and a threshold for complete cases and calculates the
   ##  correlation between sulfate and nitrate for monitor locations where the number
@@ -6,52 +8,42 @@ corr <- function(directory, threshold = 0) {
   
   ## Validation
   stopifnot(threshold >= 0)
-  stopifnot(dir.exists(directory))
+
   
+  completeList <- complete(directory) #Get a list of the completed cases for each file in dir
+  nobsAboveThresh <- (completeList$nobs > threshold) ##Logical vector of those that meet our requirements
   
-  
-  fileList <- list.files(directory, full.names=TRUE) ##Get the full file names
-  
-  completeSet <- data.frame() ##Empty data.frame to hold filenames, etc
-  
-  for (csvi in fileList) {
-    stopifnot(file.exists(csvi))
-    
-    fileTemp <- read.csv(csvi)
-    fileSubset <- subset(fileTemp,complete.cases(fileTemp))
-    
-    rows <- nrow(fileSubset)
-    
-    completeSet <- rbind(completeSet, rows)
-  }
-  
-  ##Garbagecollect
-  rm(fileTemp)
-  rm(fileSubset)
-  rm(rows)
-  
-  ## Merge the completSet data to the list of files
-  fileList <- cbind(fileList,completeSet)
-  colnames(fileList) <- c("filename", "nobs")
-  rm(completeSet)
-  
-  ## Select only those files above our threshold
-  completeList <- fileList[which(fileList$nobs > threshold),]
-  
-  
-  
-  
-  ##        OLD. Initial approach. But the course forces the output of fn Complete
-  ## So, you can't attach file names to the completedcase vectors. So... you have to
-  ## retrace to get that. Waste of time.
-  
-  ## Understand the number of completed cases for each file in the entire directory
-  ## completeList <- complete(directory)
-  
-  ## Select only those files above our threshold
-  ## completeList <- completeList[which(completeList$nobs > threshold),]
   
   ## At this point, this part of the project looks super inefficient..
+  ##
+  ## fn complete has only returned ids, which are useless and require extra processing
+  ##    If the function returned the file names, we'd save a lot of time...
+  
+  ## Get the same list of files fn complete did...
+  fileList <- list.files(directory, full.names=TRUE) ##Get the full file names
+  
+  ## Only get the file names we care about
+  filesAboveThreshold <- fileList[nobsAboveThresh]
+  
+  ##garbagecollect
+  rm(completeList)
+  rm(threshold)
+  rm(nobsAboveThresh)
+  rm(fileList)
+  
+  
+  setOfCorrelations <- vector()
+  
+  for (fileName in filesAboveThreshold) {
+    stopifnot(file.exists(fileName)) ##Validate
+    
+    ## The file again
+    fileTemp <- read.csv(fileName)
+    
+    setOfCorrelations <- rbind(setOfCorrelations,cor(fileTemp$nitrate, fileTemp$sulfate, use="complete.obs"))
+  }
+  
+  rm(filesAboveThreshold) ##gc
+  
+  return (as.numeric(setOfCorrelations))
 }
-
-test <- corr('specdata', 150)
